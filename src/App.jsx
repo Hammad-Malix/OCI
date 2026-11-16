@@ -16,201 +16,15 @@ import {
   HardDrive,
   ChevronRight,
   X,
-  FileText,
   Sliders,
-  Info,
   ArrowRight,
   Microscope
 } from 'lucide-react';
 
 /**
- * SAMPLE RETINAL CASES (Mock Clinical Dataset)
- * Includes realistic fundus anatomical coordinates, pathology markers,
- * Grad-CAM hotspot regions, SHAP pixel clusters, and multi-model metrics.
+ * BRAND BOTANICAL-OPHTHALMIC EMBLEM (Inspired by Reference Logo)
  */
-const SAMPLE_CASES = [
-  {
-    id: 'dr-moderate',
-    label: 'Diabetic Retinopathy (Moderate)',
-    patientId: 'PT-2026-104',
-    age: 58,
-    eye: 'OD (Right Eye)',
-    condition: 'Diabetic Retinopathy',
-    severity: 'Moderate NPDR (Stage 2)',
-    severityLevel: 'moderate', // 'normal' | 'moderate' | 'severe'
-    confidence: 96.4,
-    probabilities: [
-      { stage: 'No DR (Healthy)', value: 1.4 },
-      { stage: 'Mild NPDR', value: 2.2 },
-      { stage: 'Moderate NPDR', value: 96.4 },
-      { stage: 'Severe / Proliferative', value: 0.0 }
-    ],
-    fundusStyle: {
-      baseHue: '#b83c24',
-      edgeHue: '#4a140c',
-      discCupRatio: 0.34,
-      lesions: [
-        { x: 185, y: 120, r: 6, type: 'hemorrhage', label: 'Dot Hemorrhage' },
-        { x: 245, y: 155, r: 5, type: 'microaneurysm', label: 'Microaneurysm' },
-        { x: 210, y: 235, r: 7, type: 'hemorrhage', label: 'Blot Hemorrhage' },
-        { x: 275, y: 205, r: 5, type: 'exudate', label: 'Hard Exudate' },
-        { x: 260, y: 115, r: 4, type: 'microaneurysm', label: 'Microaneurysm' }
-      ],
-      gradCamHotspots: [
-        { x: 195, y: 125, r: 58, intensity: 0.92 },
-        { x: 265, y: 185, r: 65, intensity: 0.88 },
-        { x: 210, y: 235, r: 50, intensity: 0.78 }
-      ],
-      shapPoints: [
-        { x: 185, y: 120, weight: 0.95 },
-        { x: 189, y: 123, weight: 0.85 },
-        { x: 245, y: 155, weight: 0.91 },
-        { x: 210, y: 235, weight: 0.94 },
-        { x: 275, y: 205, weight: 0.89 },
-        { x: 260, y: 115, weight: 0.82 },
-        { x: 205, y: 230, weight: 0.76 }
-      ]
-    },
-    clinicalFindings: [
-      'Multiple retinal microaneurysms and dot-blot hemorrhages localized in the temporal macular arcade.',
-      'Localized hard exudate cluster superior-temporal to the fovea.',
-      'Optic disc margins remain sharp with physiological cup-to-disc ratio (0.34).'
-    ],
-    recommendation: 'Refer to ophthalmologist within 4–6 weeks for dilated fundus examination and glycemic control review.'
-  },
-  {
-    id: 'glaucoma-suspect',
-    label: 'Glaucoma (Optic Neuropathy)',
-    patientId: 'PT-2026-219',
-    age: 66,
-    eye: 'OS (Left Eye)',
-    condition: 'Primary Open-Angle Glaucoma',
-    severity: 'High-Risk Cupping (Stage 3)',
-    severityLevel: 'severe',
-    confidence: 94.8,
-    probabilities: [
-      { stage: 'Healthy Optic Nerve', value: 1.8 },
-      { stage: 'Glaucoma Suspect', value: 3.4 },
-      { stage: 'Confirmed Glaucoma', value: 94.8 }
-    ],
-    fundusStyle: {
-      baseHue: '#c24929',
-      edgeHue: '#4d180d',
-      discCupRatio: 0.76, // Enlarged optic cup hallmark of glaucoma
-      lesions: [
-        { x: 112, y: 175, r: 16, type: 'cupping', label: 'Enlarged Optic Cup (CDR 0.76)' },
-        { x: 115, y: 142, r: 6, type: 'rim-thinning', label: 'Superior Neuroretinal Rim Thinning' }
-      ],
-      gradCamHotspots: [
-        { x: 112, y: 175, r: 72, intensity: 0.96 },
-        { x: 118, y: 145, r: 44, intensity: 0.82 }
-      ],
-      shapPoints: [
-        { x: 112, y: 175, weight: 0.98 },
-        { x: 106, y: 168, weight: 0.92 },
-        { x: 118, y: 182, weight: 0.91 },
-        { x: 114, y: 152, weight: 0.88 },
-        { x: 112, y: 196, weight: 0.87 }
-      ]
-    },
-    clinicalFindings: [
-      'Marked vertical enlargement of the optic cup (Cup-to-Disc Ratio ≈ 0.76) with focal neuroretinal rim thinning.',
-      'Nasalization of central retinal vessel trunks emerging from the optic nerve head.',
-      'Macular region appears free of diabetic exudates or intraretinal hemorrhages.'
-    ],
-    recommendation: 'Urgent glaucoma specialist referral for intraocular pressure (IOP) tonometry, OCT RNFL scan, and visual field perimetry.'
-  },
-  {
-    id: 'healthy-retina',
-    label: 'Healthy Normal Retina',
-    patientId: 'PT-2026-073',
-    age: 41,
-    eye: 'OD (Right Eye)',
-    condition: 'No Ocular Pathology Detected',
-    severity: 'Normal Fundus (Stage 0)',
-    severityLevel: 'normal',
-    confidence: 98.7,
-    probabilities: [
-      { stage: 'Healthy Retina', value: 98.7 },
-      { stage: 'Diabetic Retinopathy', value: 0.8 },
-      { stage: 'Glaucoma', value: 0.5 }
-    ],
-    fundusStyle: {
-      baseHue: '#c44527',
-      edgeHue: '#54190d',
-      discCupRatio: 0.28,
-      lesions: [],
-      gradCamHotspots: [
-        { x: 112, y: 175, r: 48, intensity: 0.48 },
-        { x: 225, y: 175, r: 52, intensity: 0.45 }
-      ],
-      shapPoints: [
-        { x: 112, y: 175, weight: 0.52 },
-        { x: 225, y: 175, weight: 0.49 },
-        { x: 175, y: 140, weight: 0.41 }
-      ]
-    },
-    clinicalFindings: [
-      'Well-defined optic nerve head with healthy pink neuroretinal rim and normal cup-to-disc ratio (0.28).',
-      'Uniform macular reflex and intact retinal arterioles and venules without tortuosity.',
-      'No microaneurysms, hemorrhages, or exudates identified across all four retinal quadrants.'
-    ],
-    recommendation: 'Routine annual ophthalmic screening recommended. No immediate clinical intervention required.'
-  }
-];
-
-/**
- * COMPARATIVE DEEP LEARNING MODEL BENCHMARKS
- * Mirrors the 3 architectures and 5 evaluation metrics from the project specification.
- */
-const MODEL_BENCHMARKS = [
-  {
-    id: 'efficientnet',
-    name: 'EfficientNet-B3',
-    architecture: 'Compound-Scaled CNN',
-    badge: 'Recommended Clinical Balance',
-    accuracy: 96.4,
-    sensitivity: 95.8,
-    specificity: 97.1,
-    inferenceMs: 42,
-    memoryMb: 48,
-    summary:
-      'Achieves optimal trade-off between diagnostic sensitivity and low latency, making it ideal for real-time web and clinical deployment.'
-  },
-  {
-    id: 'vit',
-    name: 'Vision Transformer (ViT-B/16)',
-    architecture: 'Self-Attention Patch Transformer',
-    badge: 'Highest Global Context Accuracy',
-    accuracy: 97.1,
-    sensitivity: 96.6,
-    specificity: 97.5,
-    inferenceMs: 118,
-    memoryMb: 330,
-    summary:
-      'Captures long-range spatial relationships across the optic disc and macula simultaneously, yielding peak accuracy at higher compute cost.'
-  },
-  {
-    id: 'resnet50',
-    name: 'CNN – ResNet-50',
-    architecture: 'Deep Residual Convolutional Network',
-    badge: 'Reliable Baseline Architecture',
-    accuracy: 93.8,
-    sensitivity: 92.4,
-    specificity: 94.9,
-    inferenceMs: 56,
-    memoryMb: 98,
-    summary:
-      'Strong feature extraction baseline for localized retinal lesions, though slightly lower sensitivity on subtle early-stage microaneurysms.'
-  }
-];
-
-/**
- * CUSTOM BRAND EMBLEM SVG
- * Inspired by the botanical/caduceus line-art emblem in the reference header,
- * blending organic ophthalmic/retinal symmetry with editorial fine-line craftsmanship.
- */
-const OcularisEmblem = ({ className = 'w-11 h-11' }) => (
+const OcularisEmblem = ({ className = 'w-10 h-10' }) => (
   <svg
     viewBox="0 0 64 64"
     fill="none"
@@ -218,68 +32,489 @@ const OcularisEmblem = ({ className = 'w-11 h-11' }) => (
     className={className}
     aria-hidden="true"
   >
-    {/* Central Vertical Axis */}
+    {/* Central Caduceus / Optical Stem */}
     <path
-      d="M32 8V56"
+      d="M32 10V54"
       stroke="#3B666B"
-      strokeWidth="1.5"
+      strokeWidth="2.2"
       strokeLinecap="round"
     />
-    {/* Subtle Caduceus / Neural-Vascular Helix */}
+    {/* Intertwined Retinal Serpentine Curves */}
     <path
-      d="M32 18C24 22 24 29 32 33C40 37 40 44 32 48"
-      stroke="#3B666B"
-      strokeWidth="1.4"
-      strokeLinecap="round"
-    />
-    <path
-      d="M32 18C40 22 40 29 32 33C24 37 24 44 32 48"
+      d="M32 18C23 22 23 29 32 33C41 37 41 44 32 48"
       stroke="#B58E49"
-      strokeWidth="1.4"
+      strokeWidth="1.9"
       strokeLinecap="round"
     />
-    {/* Botanical / Retinal Canopy Leaves */}
     <path
-      d="M32 16C25 10 15 11 12 17C18 20 26 19 32 16Z"
+      d="M32 18C41 22 41 29 32 33C23 37 23 44 32 48"
       stroke="#3B666B"
-      strokeWidth="1.4"
-      fill="#3B666B"
-      fillOpacity="0.08"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+    />
+    {/* Symmetrical Botanical Leaf Branches */}
+    <path
+      d="M32 24C24 18 14 18 10 24C16 28 24 28 32 24Z"
+      stroke="#3B666B"
+      strokeWidth="1.6"
+      fill="#F9F8F6"
     />
     <path
-      d="M32 16C39 10 49 11 52 17C46 20 38 19 32 16Z"
+      d="M32 24C40 18 50 18 54 24C48 28 40 28 32 24Z"
       stroke="#3B666B"
-      strokeWidth="1.4"
-      fill="#3B666B"
-      fillOpacity="0.08"
+      strokeWidth="1.6"
+      fill="#F9F8F6"
     />
     <path
-      d="M32 25C23 21 15 23 13 28C19 30 26 28 32 25Z"
-      stroke="#3B666B"
-      strokeWidth="1.3"
+      d="M32 16C26 11 19 10 15 14C19 18 26 18 32 16Z"
+      stroke="#B58E49"
+      strokeWidth="1.5"
+      fill="#F9F8F6"
     />
     <path
-      d="M32 25C41 21 49 23 51 28C45 30 38 28 32 25Z"
-      stroke="#3B666B"
-      strokeWidth="1.3"
+      d="M32 16C38 11 45 10 49 14C45 18 38 18 32 16Z"
+      stroke="#B58E49"
+      strokeWidth="1.5"
+      fill="#F9F8F6"
     />
-    {/* Central Ocular Pupil / Focus Node */}
-    <circle cx="32" cy="14" r="2.5" fill="#B58E49" />
+    {/* Upper Optical Iris Crown */}
+    <circle cx="32" cy="10" r="3" fill="#B58E49" />
   </svg>
 );
 
 /**
+ * CLINICAL SAMPLE CASES (Pre-configured Retinal Fundus Scenarios & XAI Coordinates)
+ */
+const SAMPLE_CASES = [
+  {
+    id: 'dr-moderate',
+    label: 'Moderate Diabetic Retinopathy',
+    patientId: 'PT-2026-104',
+    age: 58,
+    eye: 'OD (Right Eye)',
+    condition: 'Diabetic Retinopathy (NPDR)',
+    severity: 'Stage 2 • Moderate NPDR',
+    severityLevel: 'moderate',
+    confidence: 96.4,
+    probabilities: [
+      { stage: 'No DR (Healthy)', value: 1.2 },
+      { stage: 'Mild NPDR', value: 2.1 },
+      { stage: 'Moderate NPDR', value: 96.4 },
+      { stage: 'Severe / Proliferative DR', value: 0.3 }
+    ],
+    clinicalFindings: [
+      'Clustered dot-blot retinal hemorrhages & microaneurysms localized in superior temporal arcade.',
+      'Hard lipid exudates adjacent to the macular boundary highlighted by Grad-CAM peak activation.',
+      'Optic disc cup-to-disc ratio remains within normal physiological limits (CDR 0.34).'
+    ],
+    recommendation:
+      'Refer for comprehensive dilated fundus examination within 3–4 weeks and optimize HbA1c glycemic control.',
+    fundusStyle: {
+      baseHue: '#C94B32',
+      edgeHue: '#420D06',
+      discCupRatio: 0.34,
+      lesions: [
+        { type: 'hemorrhage', x: 215, y: 122, r: 5.5 },
+        { type: 'microaneurysm', x: 248, y: 146, r: 4 },
+        { type: 'exudate', x: 204, y: 158, r: 4.5 },
+        { type: 'hemorrhage', x: 232, y: 222, r: 5 }
+      ],
+      gradCamHotspots: [
+        { x: 218, y: 128, r: 56, intensity: 0.95 },
+        { x: 242, y: 152, r: 44, intensity: 0.8 },
+        { x: 230, y: 220, r: 42, intensity: 0.72 }
+      ],
+      shapPoints: [
+        { x: 215, y: 122, weight: 0.96 },
+        { x: 248, y: 146, weight: 0.88 },
+        { x: 204, y: 158, weight: 0.84 },
+        { x: 232, y: 222, weight: 0.79 }
+      ]
+    }
+  },
+  {
+    id: 'glaucoma-suspect',
+    label: 'Primary Open-Angle Glaucoma',
+    patientId: 'PT-2026-219',
+    age: 66,
+    eye: 'OS (Left Eye)',
+    condition: 'Glaucomatous Optic Neuropathy',
+    severity: 'High Risk • Advanced Cupping',
+    severityLevel: 'severe',
+    confidence: 94.8,
+    probabilities: [
+      { stage: 'Normal Optic Nerve', value: 1.8 },
+      { stage: 'Glaucoma Suspect', value: 3.4 },
+      { stage: 'Confirmed Glaucoma', value: 94.8 }
+    ],
+    clinicalFindings: [
+      'Pronounced vertical elongation and enlargement of the optic cup (Cup-to-Disc Ratio 0.78).',
+      'Inferior neuroretinal rim thinning ("ISNT rule" violation) strongly weighted by SHAP attribution.',
+      'Peripapillary retinal nerve fiber layer (RNFL) wedge defect radiating inferotemporally.'
+    ],
+    recommendation:
+      'Urgent ophthalmology referral for Optical Coherence Tomography (OCT-RNFL), Humphrey Visual Field testing, and IOP tonometry.',
+    fundusStyle: {
+      baseHue: '#BF472E',
+      edgeHue: '#3B0B05',
+      discCupRatio: 0.78,
+      lesions: [
+        { type: 'microaneurysm', x: 112, y: 175, r: 14 }
+      ],
+      gradCamHotspots: [
+        { x: 112, y: 175, r: 62, intensity: 0.98 },
+        { x: 138, y: 214, r: 40, intensity: 0.68 }
+      ],
+      shapPoints: [
+        { x: 112, y: 166, weight: 0.98 },
+        { x: 112, y: 184, weight: 0.95 },
+        { x: 124, y: 175, weight: 0.85 },
+        { x: 138, y: 214, weight: 0.74 }
+      ]
+    }
+  },
+  {
+    id: 'healthy-normal',
+    label: 'Healthy Normal Retina',
+    patientId: 'PT-2026-308',
+    age: 41,
+    eye: 'OD (Right Eye)',
+    condition: 'No Ocular Pathology Detected',
+    severity: 'Normal • Routine Screening',
+    severityLevel: 'normal',
+    confidence: 98.7,
+    probabilities: [
+      { stage: 'Healthy Retina', value: 98.7 },
+      { stage: 'Diabetic Retinopathy', value: 0.8 },
+      { stage: 'Glaucoma Suspect', value: 0.5 }
+    ],
+    clinicalFindings: [
+      'Crisp optic disc margins with healthy pink neuroretinal rim and physiological cup (CDR 0.28).',
+      'Uniform macular pigmentation with intact foveal reflex and zero vascular leakage or exudates.',
+      'Normal arteriovenous caliber ratio across superior and inferior temporal vascular arcades.'
+    ],
+    recommendation:
+      'No acute retinal pathology detected. Recommend routine annual ophthalmic screening.',
+    fundusStyle: {
+      baseHue: '#D15136',
+      edgeHue: '#470E07',
+      discCupRatio: 0.28,
+      lesions: [],
+      gradCamHotspots: [
+        { x: 114, y: 175, r: 46, intensity: 0.42 },
+        { x: 222, y: 178, r: 48, intensity: 0.38 }
+      ],
+      shapPoints: [
+        { x: 114, y: 175, weight: 0.52 },
+        { x: 222, y: 178, weight: 0.48 }
+      ]
+    }
+  }
+];
+
+/**
+ * MULTI-MODEL COMPARATIVE BENCHMARK DATASET
+ * Compares CNN - ResNet-50, EfficientNet-B3, and Vision Transformer (ViT-B/16)
+ */
+const MODEL_BENCHMARKS = [
+  {
+    id: 'efficientnet',
+    name: 'EfficientNet-B3',
+    badge: 'Recommended Clinical Balance',
+    architecture: 'Compound-Scaled Mobile Inverted Bottleneck CNN',
+    summary:
+      'Delivers the optimal trade-off between diagnostic sensitivity and sub-50ms inference speed, making it ideal for real-time hospital web deployment.',
+    accuracy: 96.4,
+    sensitivity: 95.8,
+    specificity: 97.1,
+    inferenceMs: 42,
+    memoryMb: 48
+  },
+  {
+    id: 'vit',
+    name: 'Vision Transformer (ViT-B/16)',
+    badge: 'Highest Peak Accuracy',
+    architecture: 'Self-Attention Patch Sequence Transformer (16×16)',
+    summary:
+      'Captures long-range spatial relationships between the optic disc and peripheral macula, achieving peak sensitivity at higher compute cost.',
+    accuracy: 97.1,
+    sensitivity: 96.9,
+    specificity: 97.4,
+    inferenceMs: 118,
+    memoryMb: 330
+  },
+  {
+    id: 'resnet50',
+    name: 'CNN – ResNet-50',
+    badge: 'Interpretable Grad-CAM Baseline',
+    architecture: '50-Layer Deep Residual Convolutional Network',
+    summary:
+      'Provides highly localized spatial feature maps in final residual blocks, producing crisp Grad-CAM overlays for microaneurysm verification.',
+    accuracy: 94.2,
+    sensitivity: 93.1,
+    specificity: 95.3,
+    inferenceMs: 64,
+    memoryMb: 98
+  }
+];
+
+/**
+ * BESPOKE HERO OPHTHALMIC IRIS & RETINAL FUNDUS XAI ILLUSTRATION
+ */
+const HeroOphthalmicVisual = () => (
+  <div className="relative w-full aspect-[4/4.3] rounded-tl-[96px] rounded-br-[96px] rounded-tr-2xl rounded-bl-2xl overflow-hidden bg-gradient-to-b from-[#162220] via-[#1C2C2A] to-[#111A19] border border-white/15 flex flex-col justify-between p-5 sm:p-6">
+    {/* Subtle Clinical Coordinate Grid & Radial Glow Backdrop */}
+    <svg
+      viewBox="0 0 400 420"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="absolute inset-0 w-full h-full object-cover"
+      aria-label="Anatomical Human Iris and Retinal Fundus XAI Diagnostic Scan"
+    >
+      <defs>
+        <radialGradient id="heroAmbientGlow" cx="50%" cy="46%" r="52%">
+          <stop offset="0%" stopColor="#3B666B" stopOpacity="0.45" />
+          <stop offset="60%" stopColor="#1E3230" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="#0E1615" stopOpacity="0" />
+        </radialGradient>
+
+        <linearGradient id="scleraGrad" x1="40" y1="195" x2="360" y2="195" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#263836" />
+          <stop offset="22%" stopColor="#DCE6E4" />
+          <stop offset="50%" stopColor="#F5F7F6" />
+          <stop offset="78%" stopColor="#DCE6E4" />
+          <stop offset="100%" stopColor="#263836" />
+        </linearGradient>
+
+        <radialGradient id="irisStromaGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#0E1716" />
+          <stop offset="46%" stopColor="#2A4D52" />
+          <stop offset="74%" stopColor="#3B666B" />
+          <stop offset="90%" stopColor="#233F43" />
+          <stop offset="100%" stopColor="#142628" />
+        </radialGradient>
+
+        <radialGradient id="pupilFundusGrad" cx="46%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#D45438" />
+          <stop offset="58%" stopColor="#9E2B16" />
+          <stop offset="88%" stopColor="#5C160B" />
+          <stop offset="100%" stopColor="#2B0904" />
+        </radialGradient>
+
+        <radialGradient id="pupilGradCam" cx="62%" cy="44%" r="36%">
+          <stop offset="0%" stopColor="#FF3B1D" stopOpacity="0.88" />
+          <stop offset="45%" stopColor="#FBBF24" stopOpacity="0.62" />
+          <stop offset="80%" stopColor="#34D399" stopOpacity="0.24" />
+          <stop offset="100%" stopColor="#34D399" stopOpacity="0" />
+        </radialGradient>
+
+        <clipPath id="eyeApertureClip">
+          <path d="M36 195C88 118 148 92 200 92C252 92 312 118 364 195C312 272 252 298 200 298C148 298 88 272 36 195Z" />
+        </clipPath>
+
+        <clipPath id="pupilWindowClip">
+          <circle cx="200" cy="195" r="46" />
+        </clipPath>
+      </defs>
+
+      <rect width="400" height="420" fill="url(#heroAmbientGlow)" />
+
+      <circle cx="200" cy="195" r="154" stroke="#7FD1C8" strokeOpacity="0.12" strokeWidth="1" strokeDasharray="3 5" />
+      <circle cx="200" cy="195" r="126" stroke="#B58E49" strokeOpacity="0.22" strokeWidth="1" />
+      <line x1="200" y1="26" x2="200" y2="56" stroke="#B58E49" strokeOpacity="0.45" strokeWidth="1.2" />
+      <line x1="200" y1="334" x2="200" y2="364" stroke="#B58E49" strokeOpacity="0.45" strokeWidth="1.2" />
+      <line x1="22" y1="195" x2="48" y2="195" stroke="#7FD1C8" strokeOpacity="0.35" strokeWidth="1.2" />
+      <line x1="352" y1="195" x2="378" y2="195" stroke="#7FD1C8" strokeOpacity="0.35" strokeWidth="1.2" />
+
+      <path
+        d="M52 154C102 96 154 74 200 74C246 74 298 96 348 154"
+        stroke="#B58E49"
+        strokeOpacity="0.42"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+
+      <g clipPath="url(#eyeApertureClip)">
+        <rect x="30" y="88" width="340" height="214" fill="url(#scleraGrad)" />
+
+        <path d="M52 186C72 182 88 189 104 185" stroke="#C97A7E" strokeOpacity="0.35" strokeWidth="1" />
+        <path d="M60 206C78 211 94 204 110 209" stroke="#C97A7E" strokeOpacity="0.3" strokeWidth="0.9" />
+        <path d="M348 188C328 183 312 190 296 186" stroke="#C97A7E" strokeOpacity="0.35" strokeWidth="1" />
+        <path d="M340 208C322 212 306 205 290 210" stroke="#C97A7E" strokeOpacity="0.3" strokeWidth="0.9" />
+
+        <circle cx="200" cy="195" r="88" fill="url(#irisStromaGrad)" />
+
+        {Array.from({ length: 36 }).map((_, idx) => {
+          const angle = (idx * 10 * Math.PI) / 180;
+          const x1 = 200 + Math.cos(angle) * 48;
+          const y1 = 195 + Math.sin(angle) * 48;
+          const x2 = 200 + Math.cos(angle) * 84;
+          const y2 = 195 + Math.sin(angle) * 84;
+          return (
+            <line
+              key={idx}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke={idx % 3 === 0 ? '#E6C587' : '#8AD4CC'}
+              strokeOpacity={idx % 3 === 0 ? '0.28' : '0.2'}
+              strokeWidth={idx % 2 === 0 ? '1.1' : '0.7'}
+            />
+          );
+        })}
+
+        <circle
+          cx="200"
+          cy="195"
+          r="62"
+          stroke="#B58E49"
+          strokeOpacity="0.55"
+          strokeWidth="1.4"
+          strokeDasharray="4 3"
+        />
+
+        <g clipPath="url(#pupilWindowClip)">
+          <circle cx="200" cy="195" r="46" fill="url(#pupilFundusGrad)" />
+
+          <circle cx="180" cy="196" r="10.5" fill="#FDE68A" fillOpacity="0.92" />
+          <circle cx="180" cy="196" r="4.2" fill="#FFFBEB" />
+
+          <path
+            d="M180 194C192 174 212 169 236 179"
+            stroke="#590D08"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M180 198C193 218 214 222 238 211"
+            stroke="#590D08"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M180 193C172 176 164 166 156 158"
+            stroke="#6B120C"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+          <path
+            d="M180 199C172 215 164 225 156 233"
+            stroke="#6B120C"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+          <path
+            d="M202 177C210 185 216 189 223 191"
+            stroke="#6B120C"
+            strokeWidth="1.1"
+            strokeLinecap="round"
+          />
+          <path
+            d="M203 213C211 205 217 201 224 199"
+            stroke="#6B120C"
+            strokeWidth="1.1"
+            strokeLinecap="round"
+          />
+
+          <circle cx="200" cy="195" r="46" fill="url(#pupilGradCam)" />
+
+          <circle
+            cx="221"
+            cy="187"
+            r="9.5"
+            stroke="#FCD34D"
+            strokeWidth="1.4"
+            strokeDasharray="2.5 2"
+          />
+          <circle cx="221" cy="187" r="2" fill="#FFFBEB" />
+        </g>
+
+        <circle cx="200" cy="195" r="46" stroke="#0E1716" strokeWidth="2.2" />
+        <ellipse
+          cx="176"
+          cy="171"
+          rx="11"
+          ry="6"
+          transform="rotate(-28 176 171)"
+          fill="#FFFFFF"
+          fillOpacity="0.48"
+        />
+        <circle cx="166" cy="183" r="2.8" fill="#FFFFFF" fillOpacity="0.35" />
+
+        <path
+          d="M36 195C88 118 148 92 200 92C252 92 312 118 364 195C312 134 252 112 200 112C148 112 88 134 36 195Z"
+          fill="#0F1918"
+          fillOpacity="0.42"
+        />
+      </g>
+
+      <path
+        d="M36 195C88 118 148 92 200 92C252 92 312 118 364 195"
+        stroke="#E6C587"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M36 195C88 272 148 298 200 298C252 298 312 272 364 195"
+        stroke="#7FD1C8"
+        strokeOpacity="0.65"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+
+      <circle cx="116" cy="122" r="3" fill="#B58E49" />
+      <circle cx="284" cy="122" r="3" fill="#B58E49" />
+      <circle cx="116" cy="268" r="2.8" fill="#7FD1C8" />
+      <circle cx="284" cy="268" r="2.8" fill="#7FD1C8" />
+    </svg>
+
+    {/* Top Telemetry Header Row */}
+    <div className="relative z-10 flex items-center justify-between text-[11px] px-1">
+      <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/10 text-[#E6C587] font-semibold tracking-wider uppercase">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        <span>Retinal Fundus + XAI</span>
+      </span>
+      <span className="text-white/75 font-medium tracking-wide bg-black/35 px-2.5 py-1 rounded-full">
+        Grad-CAM Active
+      </span>
+    </div>
+
+    {/* Bottom Clinical Diagnostic HUD Card */}
+    <div className="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 text-white border border-white/15 shadow-lg">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.16em] text-[#E6C587] font-semibold">
+            DR &amp; Glaucoma Early Screening
+          </p>
+          <p className="text-sm sm:text-[15px] font-semibold mt-0.5 text-white">
+            Biomarker Localization Verified
+          </p>
+        </div>
+        <div className="text-right shrink-0">
+          <span className="px-2.5 py-1 rounded-full bg-[#B58E49] text-white text-xs font-bold block">
+            96.4% Acc
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-2.5 pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px] text-white/75">
+        <span>Optic Disc &amp; Macula Scan</span>
+        <span className="text-[#8AD4CC] font-semibold">EfficientNet-B3 • 42ms</span>
+      </div>
+    </div>
+  </div>
+);
+
+/**
  * INTERACTIVE RETINAL FUNDUS + XAI HEATMAP CANVAS
- * Renders a high-detail anatomical retinal fundus scan (or user-uploaded retinal image)
- * layered with real-time Grad-CAM thermal gradients, SHAP pixel attributions,
- * and clinical pathology bounding annotations.
  */
 const RetinalXaiCanvas = ({
   caseData,
   uploadedImageUrl,
-  xaiMode, // 'original' | 'gradcam' | 'shap'
-  opacity, // 0 to 100
-  zoom, // 1 to 2.2
+  xaiMode,
+  opacity,
+  zoom,
   showAnnotations
 }) => {
   const canvasRef = useRef(null);
@@ -636,7 +871,7 @@ export default function App() {
               Designed to assist ophthalmologists with early screening—not a replacement for medical diagnosis.{' '}
               <button
                 onClick={() => scrollToSection(benchmarksRef)}
-                className="underline underline-offset-4 hover:text-[#F3D8A4] transition-colors font-medium ml-1 inline-flex items-center"
+                className="underline underline-offset-4 hover:text-[#F3D8A4] transition-colors font-medium ml-1 inline-flex items-center cursor-pointer"
               >
                 View Research Benchmarks →
               </button>
@@ -645,7 +880,7 @@ export default function App() {
           <button
             onClick={() => setShowBanner(false)}
             aria-label="Dismiss clinical banner"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/75 hover:text-white p-1"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/75 hover:text-white p-1 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -658,8 +893,14 @@ export default function App() {
           {/* Left Navigation Links */}
           <nav className="hidden md:flex items-center space-x-7 text-[14px] font-medium text-[#2B3A38]/85">
             <button
+              onClick={() => scrollToSection(aboutRef)}
+              className="hover:text-[#3B666B] transition-colors cursor-pointer"
+            >
+              Discover
+            </button>
+            <button
               onClick={() => scrollToSection(workspaceRef)}
-              className="hover:text-[#3B666B] transition-colors"
+              className="hover:text-[#3B666B] transition-colors cursor-pointer"
             >
               Screening
             </button>
@@ -668,25 +909,19 @@ export default function App() {
                 setXaiMode('gradcam');
                 scrollToSection(workspaceRef);
               }}
-              className="hover:text-[#3B666B] transition-colors"
+              className="hover:text-[#3B666B] transition-colors cursor-pointer"
             >
               XAI Diagnostics
             </button>
             <button
               onClick={() => scrollToSection(benchmarksRef)}
-              className="hover:text-[#3B666B] transition-colors"
+              className="hover:text-[#3B666B] transition-colors cursor-pointer"
             >
-              Model Benchmarks
-            </button>
-            <button
-              onClick={() => scrollToSection(aboutRef)}
-              className="hover:text-[#3B666B] transition-colors"
-            >
-              Architecture
+              Research Lab
             </button>
           </nav>
 
-          {/* Center Brand Emblem & Stacked Serif Logo (Matching Endura Wellness Reference) */}
+          {/* Center Brand Emblem & Stacked Serif Logo */}
           <a
             href="#top"
             className="flex items-center space-x-3 mx-auto md:mx-0 group"
@@ -694,7 +929,7 @@ export default function App() {
             <OcularisEmblem className="w-10 h-10 sm:w-11 sm:h-11 transition-transform duration-300 group-hover:scale-105" />
             <div className="flex flex-col leading-none">
               <span className="font-editorial text-xl sm:text-2xl tracking-[0.18em] text-[#3B666B] font-semibold uppercase">
-                OCULARIS
+                OCULENS
               </span>
               <span className="font-editorial text-sm sm:text-base tracking-[0.26em] text-[#3B666B]/90 uppercase mt-0.5">
                 RETINAL AI
@@ -702,7 +937,7 @@ export default function App() {
             </div>
           </a>
 
-          {/* Right Header Actions (Asymmetric Rounded Pill CTA matching reference) */}
+          {/* Right Header Actions (Asymmetric Rounded Pill CTA) */}
           <div className="flex items-center space-x-4">
             <span className="hidden lg:inline-flex items-center text-xs uppercase tracking-widest text-[#3B666B] font-semibold">
               <ShieldCheck className="w-4 h-4 mr-1.5 text-[#B58E49]" />
@@ -751,13 +986,13 @@ export default function App() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
             {/* LEFT COLUMN: Asymmetric Arch-Cutout Frame + Decorative Gold & Teal Botanical Petals */}
             <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full max-w-[390px]">
+              <div className="relative w-full max-w-[400px]">
                 {/* Decorative Leaf / Petal Accents on Top-Left Corner (Exact signature motif from reference) */}
                 <svg
                   viewBox="0 0 90 110"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-16 h-20 sm:w-20 sm:h-24 absolute -top-6 -left-6 z-20 drop-shadow-sm"
+                  className="w-16 h-20 sm:w-20 sm:h-24 absolute -top-6 -left-6 z-20 drop-shadow-sm pointer-events-none"
                   aria-hidden="true"
                 >
                   {/* Warm Ochre / Gold Petal (#B58E49) */}
@@ -777,43 +1012,9 @@ export default function App() {
                   />
                 </svg>
 
-                {/* Asymmetric Rounded Frame matching reference image cutout */}
-                <div className="relative bg-[#1E2B2A] rounded-tl-[110px] rounded-br-[110px] rounded-tr-3xl rounded-bl-3xl p-6 sm:p-7 shadow-2xl border-4 border-white/80">
-                  <div className="flex items-center justify-between text-xs text-white/75 mb-3 px-2">
-                    <span className="uppercase tracking-widest text-[10px] text-[#E6C587] font-semibold">
-                      Live XAI Preview
-                    </span>
-                    <span>Grad-CAM Active</span>
-                  </div>
-
-                  {/* Mini Interactive Retinal Preview inside the Hero Frame */}
-                  <div className="relative rounded-2xl overflow-hidden bg-[#141D1C] p-2">
-                    <RetinalXaiCanvas
-                      caseData={SAMPLE_CASES[0]}
-                      uploadedImageUrl={null}
-                      xaiMode="gradcam"
-                      opacity={78}
-                      zoom={1}
-                      showAnnotations={true}
-                    />
-                  </div>
-
-                  {/* Clinical Summary Pill inside Hero Frame */}
-                  <div className="mt-4 bg-white/10 backdrop-blur-md rounded-xl p-3.5 text-white border border-white/10">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wider text-[#E6C587]">
-                          Detected Biomarker
-                        </p>
-                        <p className="text-sm font-semibold mt-0.5">
-                          Moderate Diabetic Retinopathy
-                        </p>
-                      </div>
-                      <span className="px-2.5 py-1 rounded-full bg-[#B58E49] text-white text-xs font-bold">
-                        96.4%
-                      </span>
-                    </div>
-                  </div>
+                {/* Asymmetric Rounded Frame showcasing the Anatomical Eye & Retinal Fundus XAI Visual */}
+                <div className="relative bg-[#1E2B2A] rounded-tl-[110px] rounded-br-[110px] rounded-tr-3xl rounded-bl-3xl p-3 sm:p-3.5 shadow-2xl border-4 border-white/85">
+                  <HeroOphthalmicVisual />
                 </div>
               </div>
             </div>
@@ -829,13 +1030,13 @@ export default function App() {
               </h1>
 
               <p className="mt-6 text-base sm:text-[17px] leading-relaxed text-[#2B3A38]/85 max-w-2xl bg-[#F9F8F6]/70 sm:bg-transparent rounded-xl p-2 sm:p-0">
-                At Ocularis Retinal AI, we combine deep learning screening for{' '}
+                At OcuLens Retinal AI, we combine deep learning screening for{' '}
                 <strong className="font-semibold text-[#2B3A38]">Diabetic Retinopathy</strong> and{' '}
                 <strong className="font-semibold text-[#2B3A38]">Glaucoma</strong> with visual{' '}
                 <strong className="font-semibold text-[#2B3A38]">Grad-CAM &amp; SHAP heatmaps</strong>—empowering clinicians to verify every prediction with complete confidence.
               </p>
 
-              {/* CTA Row: Warm Ochre Pill Button (#B58E49) matching 'BOOK AN APPOINTMENT' in reference */}
+              {/* CTA Row: Warm Ochre Pill Button (#B58E49) */}
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <button
                   onClick={() => scrollToSection(workspaceRef)}
@@ -885,10 +1086,550 @@ export default function App() {
         </div>
       </section>
 
+      {/* 3B. DISCOVER OCULENS EDITORIAL SECTION (Exact Reference Layout: Top Sage/Teal Wave + Left Gold Serif + Right Tall Rounded Arch with Gold & Teal Petals) */}
+      <section
+        ref={aboutRef}
+        className="relative bg-[#F9F8F6] overflow-hidden pb-20 sm:pb-28"
+      >
+        {/* Top Layered Organic Wave Banner (#5D7E7B & #A3B5B0) */}
+        <div className="w-full overflow-hidden leading-none" aria-hidden="true">
+          <svg
+            viewBox="0 0 1440 165"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-[100px] sm:h-[155px] block"
+            preserveAspectRatio="none"
+          >
+            {/* Soft Sage Wave Layer */}
+            <path
+              d="M0 0H1440V145C1240 52 960 6 660 45C390 80 180 128 0 112V0Z"
+              fill="#A3B5B0"
+              fillOpacity="0.68"
+            />
+            {/* Deep Slate-Teal Upper Wave Layer */}
+            <path
+              d="M0 0H1440V92C1230 28 940 -4 620 26C350 51 160 68 0 54V0Z"
+              fill="#5D7E7B"
+              fillOpacity="0.92"
+            />
+          </svg>
+        </div>
+
+        {/* Two-Column Asymmetric Editorial Container */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+            {/* LEFT COLUMN: Warm Gold Editorial Serif Title + Two Clinical Paragraphs + Ochre CTA */}
+            <div className="lg:col-span-6 lg:pr-6">
+              <h2 className="font-editorial text-4xl sm:text-5xl lg:text-[54px] leading-[1.08] text-[#B58E49] font-normal tracking-tight">
+                Discover OcuLens Clinical Screening
+              </h2>
+
+              <p className="mt-6 text-[15px] sm:text-base leading-[1.75] text-[#2B3A38]/85">
+                Welcome to a new standard in preventative ophthalmic care, where early retinal screening meets transparent deep learning science. Engineered to detect{' '}
+                <strong className="font-semibold text-[#2B3A38]">Diabetic Retinopathy</strong> and{' '}
+                <strong className="font-semibold text-[#2B3A38]">Glaucoma</strong> at their earliest stages, OcuLens analyzes high-resolution fundus imagery to classify disease presence and severity grading—helping patients receive timely clinical intervention before irreversible vision loss occurs.
+              </p>
+
+              <p className="mt-5 text-[15px] sm:text-base leading-[1.75] text-[#2B3A38]/85">
+                Unlike traditional &ldquo;black-box&rdquo; algorithms, our Explainable AI engine pairs every prediction with visual{' '}
+                <strong className="font-semibold text-[#2B3A38]">Grad-CAM and SHAP heatmaps</strong> that pinpoint microaneurysms, retinal blood spots, and optic disc cupping—backed by rigorous benchmarking across ResNet-50, EfficientNet-B3, and Vision Transformers.
+              </p>
+
+              <div className="mt-9">
+                <button
+                  onClick={() => scrollToSection(workspaceRef)}
+                  className="bg-[#B58E49] hover:bg-[#9E7A3B] text-white text-xs sm:text-[13px] font-bold tracking-[0.15em] uppercase px-8 py-4 rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl rounded-br-sm shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                >
+                  Launch Screening Studio
+                </button>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: Tall Rounded-Arch Frame with Deep Forest Architectural Backdrop & Overlapping Gold/Teal Botanical Petals */}
+            <div className="lg:col-span-6 flex justify-center lg:justify-end">
+              <div className="relative w-full max-w-[430px] pt-4 pb-4 px-4">
+                {/* Upper-Left Overlapping Warm Gold Botanical Leaf Cluster (#B58E49) */}
+                <svg
+                  viewBox="0 0 110 120"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-20 h-22 sm:w-24 sm:h-28 absolute -top-2 -left-1 z-20 pointer-events-none"
+                  aria-hidden="true"
+                >
+                  {/* Top-left gold leaf */}
+                  <path
+                    d="M18 14C34 15 46 28 47 45C31 44 19 31 18 14Z"
+                    fill="#B58E49"
+                  />
+                  {/* Upper-right gold leaf */}
+                  <path
+                    d="M66 10C54 22 52 38 61 52C73 40 75 24 66 10Z"
+                    fill="#B58E49"
+                  />
+                  {/* Middle-left gold leaf */}
+                  <path
+                    d="M22 60C38 56 54 63 60 78C44 82 28 75 22 60Z"
+                    fill="#B58E49"
+                  />
+                  {/* Lower-right gold leaf */}
+                  <path
+                    d="M84 54C71 63 66 78 73 93C86 84 91 69 84 54Z"
+                    fill="#B58E49"
+                  />
+                  {/* Bottom-left gold leaf */}
+                  <path
+                    d="M36 96C50 90 65 94 73 107C59 113 44 109 36 96Z"
+                    fill="#B58E49"
+                  />
+                </svg>
+
+                {/* Tall Vertical Rounded-Arch Container (Matching Reference Arch Proportions) */}
+                <div className="relative w-full h-[460px] sm:h-[510px] rounded-t-[215px] rounded-b-none overflow-hidden bg-[#26332F] shadow-xl border border-[#2B3A38]/15 flex flex-col justify-between">
+                  {/* Medical-Grade Ophthalmology Diagnostic Suite Illustration (Self-Contained SVG) */}
+                  <svg
+                    viewBox="0 0 430 510"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    role="img"
+                    aria-label="Modern ophthalmology diagnostic workstation with fundus retinal camera and calibrated Grad-CAM clinical display"
+                  >
+                    <defs>
+                      {/* Warm-Lit Ophthalmic Suite Backdrop Gradient */}
+                      <linearGradient id="suiteWallGrad" x1="215" y1="0" x2="215" y2="510" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#354641" />
+                        <stop offset="52%" stopColor="#263430" />
+                        <stop offset="100%" stopColor="#1B2522" />
+                      </linearGradient>
+
+                      {/* Ambient Recessed Ceiling Halo */}
+                      <radialGradient id="ceilingHalo" cx="50%" cy="18%" r="48%">
+                        <stop offset="0%" stopColor="#F3D8A4" stopOpacity="0.22" />
+                        <stop offset="55%" stopColor="#5D7E7B" stopOpacity="0.08" />
+                        <stop offset="100%" stopColor="#263430" stopOpacity="0" />
+                      </radialGradient>
+
+                      {/* Calibrated Clinical Display Screen Glow */}
+                      <linearGradient id="monitorBezelGrad" x1="120" y1="108" x2="365" y2="285" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#1E2927" />
+                        <stop offset="100%" stopColor="#0E1514" />
+                      </linearGradient>
+
+                      {/* Retinal Fundus Sphere Gradient */}
+                      <radialGradient id="suiteFundusGrad" cx="46%" cy="50%" r="50%">
+                        <stop offset="0%" stopColor="#D9583B" />
+                        <stop offset="64%" stopColor="#942815" />
+                        <stop offset="92%" stopColor="#4F1209" />
+                        <stop offset="100%" stopColor="#2A0804" />
+                      </radialGradient>
+
+                      {/* Grad-CAM Thermal Biomarker Overlay */}
+                      <radialGradient id="suiteGradCamHot" cx="63%" cy="41%" r="34%">
+                        <stop offset="0%" stopColor="#FF2E00" stopOpacity="0.92" />
+                        <stop offset="42%" stopColor="#FACC15" stopOpacity="0.72" />
+                        <stop offset="76%" stopColor="#22C55E" stopOpacity="0.34" />
+                        <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+                      </radialGradient>
+
+                      {/* Secondary Subtle Optic Disc Activation */}
+                      <radialGradient id="suiteGradCamDisc" cx="35%" cy="50%" r="24%">
+                        <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.55" />
+                        <stop offset="65%" stopColor="#10B981" stopOpacity="0.25" />
+                        <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
+                      </radialGradient>
+
+                      {/* Brushed Titanium / Warm Alabaster Housing for Fundus Camera */}
+                      <linearGradient id="cameraBodyGrad" x1="58" y1="215" x2="188" y2="355" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#F7F5F0" />
+                        <stop offset="55%" stopColor="#E4E0D8" />
+                        <stop offset="100%" stopColor="#C4BEB3" />
+                      </linearGradient>
+
+                      {/* Optical Objective Lens Glass Reflection */}
+                      <radialGradient id="opticalLensGrad" cx="42%" cy="38%" r="55%">
+                        <stop offset="0%" stopColor="#67E8F9" stopOpacity="0.75" />
+                        <stop offset="38%" stopColor="#3B666B" stopOpacity="0.9" />
+                        <stop offset="78%" stopColor="#16282A" />
+                        <stop offset="100%" stopColor="#091112" />
+                      </radialGradient>
+
+                      {/* Clinical Examination Table Surface */}
+                      <linearGradient id="deskSurfaceGrad" x1="215" y1="362" x2="215" y2="430" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#D7CFC2" />
+                        <stop offset="35%" stopColor="#B8AE9E" />
+                        <stop offset="100%" stopColor="#8C8273" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* 1. Architectural Suite Backdrop & Soft Lighting */}
+                    <rect width="430" height="510" fill="url(#suiteWallGrad)" />
+                    <rect width="430" height="510" fill="url(#ceilingHalo)" />
+
+                    {/* Subtle Architectural Vertical Fluting in Background */}
+                    <g opacity="0.14" stroke="#F9F8F6" strokeWidth="1">
+                      <line x1="86" y1="30" x2="86" y2="375" />
+                      <line x1="128" y1="15" x2="128" y2="375" />
+                      <line x1="302" y1="15" x2="302" y2="375" />
+                      <line x1="344" y1="30" x2="344" y2="375" />
+                    </g>
+
+                    {/* Top Clinical Suite Header Pill inside Arch */}
+                    <g transform="translate(116, 48)">
+                      <rect
+                        x="0"
+                        y="0"
+                        width="198"
+                        height="26"
+                        rx="13"
+                        fill="#192220"
+                        fillOpacity="0.78"
+                        stroke="#B58E49"
+                        strokeOpacity="0.45"
+                        strokeWidth="1"
+                      />
+                      <circle cx="16" cy="13" r="3.5" fill="#34D399" />
+                      <text
+                        x="27"
+                        y="16.5"
+                        fill="#F3D8A4"
+                        fontSize="9.5"
+                        fontWeight="700"
+                        letterSpacing="1.6"
+                        fontFamily="Plus Jakarta Sans, sans-serif"
+                      >
+                        RETINAL SUITE • XAI LIVE
+                      </text>
+                    </g>
+
+                    {/* 2. High-Resolution Calibrated Clinical Diagnostic Display (Right-Center) */}
+                    <g>
+                      {/* Articulated VESA Monitor Arm */}
+                      <path
+                        d="M276 286V334C276 346 288 354 302 354H324"
+                        stroke="#141C1A"
+                        strokeWidth="11"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M276 286V334C276 346 288 354 302 354H324"
+                        stroke="#495B56"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                      />
+                      {/* Monitor Base Plate */}
+                      <rect x="252" y="355" width="92" height="8" rx="4" fill="#2A3633" />
+
+                      {/* Outer Bezel */}
+                      <rect
+                        x="154"
+                        y="102"
+                        width="226"
+                        height="184"
+                        rx="14"
+                        fill="url(#monitorBezelGrad)"
+                        stroke="#5D7E7B"
+                        strokeOpacity="0.55"
+                        strokeWidth="1.5"
+                      />
+                      {/* Inner Active Screen */}
+                      <rect x="163" y="111" width="208" height="162" rx="9" fill="#0B1211" />
+
+                      {/* Screen Top Telemetry Header */}
+                      <rect x="163" y="111" width="208" height="22" rx="6" fill="#131E1C" />
+                      <text
+                        x="173"
+                        y="125"
+                        fill="#A3B5B0"
+                        fontSize="7.5"
+                        fontWeight="600"
+                        letterSpacing="1"
+                        fontFamily="Plus Jakarta Sans, sans-serif"
+                      >
+                        OD • FUNDUS 45° • GRAD-CAM
+                      </text>
+                      <rect x="319" y="116" width="44" height="12" rx="6" fill="#B58E49" fillOpacity="0.25" />
+                      <text
+                        x="325"
+                        y="124.5"
+                        fill="#F3D8A4"
+                        fontSize="7"
+                        fontWeight="700"
+                        fontFamily="Plus Jakarta Sans, sans-serif"
+                      >
+                        96.4% AI
+                      </text>
+
+                      {/* Detailed Retinal Fundus Scan inside Clinical Monitor */}
+                      <g transform="translate(232, 199)">
+                        {/* Outer Retinal Field */}
+                        <circle cx="0" cy="0" r="54" fill="url(#suiteFundusGrad)" />
+
+                        {/* Subtle Choroidal Vignette Ring */}
+                        <circle
+                          cx="0"
+                          cy="0"
+                          r="53"
+                          stroke="#1F0603"
+                          strokeWidth="2.5"
+                        />
+
+                        {/* Macula / Fovea Dark Region */}
+                        <circle cx="14" cy="2" r="13" fill="#4A0F07" fillOpacity="0.58" />
+                        <circle cx="14" cy="2" r="3" fill="#2B0703" fillOpacity="0.7" />
+
+                        {/* Optic Disc (Nasal Side) & Physiological Cup */}
+                        <circle cx="-21" cy="0" r="10.5" fill="#FDE68A" fillOpacity="0.92" />
+                        <circle cx="-21" cy="0" r="7.5" fill="#FBBF24" fillOpacity="0.45" />
+                        <circle cx="-20.5" cy="0" r="3.8" fill="#FFFBEB" />
+
+                        {/* Superior & Inferior Retinal Vascular Arcades */}
+                        <path
+                          d="M-21 -2C-12 -22 6 -30 32 -20"
+                          stroke="#590B07"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M-21 -1C-6 -14 12 -16 38 -8"
+                          stroke="#6B100A"
+                          strokeWidth="1.3"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M-21 2C-11 23 8 31 34 21"
+                          stroke="#590B07"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M-21 1C-5 15 14 17 39 9"
+                          stroke="#6B100A"
+                          strokeWidth="1.3"
+                          strokeLinecap="round"
+                        />
+                        {/* Nasal Vessel Branches */}
+                        <path
+                          d="M-22 -2C-30 -16 -38 -24 -44 -28"
+                          stroke="#6B100A"
+                          strokeWidth="1.4"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M-22 2C-30 16 -38 24 -44 28"
+                          stroke="#6B100A"
+                          strokeWidth="1.4"
+                          strokeLinecap="round"
+                        />
+                        {/* Fine Macular Arterioles */}
+                        <path
+                          d="M-2 -18C4 -10 9 -6 13 -3"
+                          stroke="#75130C"
+                          strokeWidth="0.95"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M0 19C6 11 10 7 13 4"
+                          stroke="#75130C"
+                          strokeWidth="0.95"
+                          strokeLinecap="round"
+                        />
+
+                        {/* Microaneurysm & Exudate Biomarkers */}
+                        <circle cx="11" cy="-12" r="1.8" fill="#450404" />
+                        <circle cx="21" cy="-7" r="1.5" fill="#450404" />
+                        <circle cx="17" cy="12" r="1.9" fill="#450404" />
+                        <circle cx="25" cy="4" r="1.4" fill="#FDE047" />
+
+                        {/* Grad-CAM Thermal Overlay on Fundus */}
+                        <circle cx="0" cy="0" r="54" fill="url(#suiteGradCamHot)" />
+                        <circle cx="0" cy="0" r="54" fill="url(#suiteGradCamDisc)" />
+
+                        {/* Precision XAI Reticle Ring around Detected Lesion */}
+                        <circle
+                          cx="14"
+                          cy="-9"
+                          r="12"
+                          stroke="#FCD34D"
+                          strokeWidth="1.2"
+                          strokeDasharray="2.5 2.5"
+                        />
+                      </g>
+
+                      {/* Right-Side Biometric Telemetry Readout inside Monitor */}
+                      <g transform="translate(298, 146)">
+                        <rect x="0" y="0" width="64" height="32" rx="5" fill="#14201E" stroke="#3B666B" strokeOpacity="0.4" />
+                        <text x="7" y="12" fill="#8FA6A1" fontSize="6.5" fontWeight="600" fontFamily="Plus Jakarta Sans, sans-serif">
+                          STAGE
+                        </text>
+                        <text x="7" y="24" fill="#F9F8F6" fontSize="8.5" fontWeight="700" fontFamily="Plus Jakarta Sans, sans-serif">
+                          Mod. NPDR
+                        </text>
+
+                        <rect x="0" y="38" width="64" height="32" rx="5" fill="#14201E" stroke="#3B666B" strokeOpacity="0.4" />
+                        <text x="7" y="50" fill="#8FA6A1" fontSize="6.5" fontWeight="600" fontFamily="Plus Jakarta Sans, sans-serif">
+                          CDR RATIO
+                        </text>
+                        <text x="7" y="62" fill="#34D399" fontSize="8.5" fontWeight="700" fontFamily="Plus Jakarta Sans, sans-serif">
+                          0.34 (Norm)
+                        </text>
+
+                        <rect x="0" y="76" width="64" height="32" rx="5" fill="#14201E" stroke="#B58E49" strokeOpacity="0.45" />
+                        <text x="7" y="88" fill="#8FA6A1" fontSize="6.5" fontWeight="600" fontFamily="Plus Jakarta Sans, sans-serif">
+                          LATENCY
+                        </text>
+                        <text x="7" y="100" fill="#F3D8A4" fontSize="8.5" fontWeight="700" fontFamily="Plus Jakarta Sans, sans-serif">
+                          42 ms • B3
+                        </text>
+                      </g>
+
+                      {/* Monitor Chin Bezel LED Indicator */}
+                      <circle cx="267" cy="279" r="2" fill="#34D399" />
+                    </g>
+
+                    {/* 3. Sleek Non-Mydriatic Retinal Fundus Camera Workstation (Foreground Left) */}
+                    <g>
+                      {/* Workstation Pedestal Column & Sliding XY Stage Base */}
+                      <rect x="64" y="346" width="114" height="16" rx="6" fill="#2A3633" />
+                      <rect x="76" y="336" width="90" height="12" rx="4" fill="#465652" />
+                      <rect x="104" y="302" width="34" height="36" rx="4" fill="#9E978B" />
+
+                      {/* Ergonomic Patient Chin-Rest & Forehead Frame (Left Side of Camera) */}
+                      <path
+                        d="M52 204C52 195 59 189 68 189H84"
+                        stroke="#C8C1B6"
+                        strokeWidth="4.5"
+                        strokeLinecap="round"
+                      />
+                      {/* Forehead Rest Pad */}
+                      <rect x="46" y="198" width="12" height="24" rx="5" fill="#3B666B" />
+                      {/* Vertical Chin-Rest Pillar */}
+                      <line x1="56" y1="216" x2="56" y2="346" stroke="#B5AEA2" strokeWidth="4" />
+                      {/* Contoured Chin Cup */}
+                      <path
+                        d="M46 296C46 303 66 303 66 296"
+                        stroke="#3B666B"
+                        strokeWidth="5"
+                        strokeLinecap="round"
+                      />
+
+                      {/* Main Contoured Fundus Camera Housing */}
+                      <path
+                        d="M84 218C84 205 95 196 108 196H156C172 196 184 208 184 224V286C184 298 174 308 162 308H104C93 308 84 299 84 288V218Z"
+                        fill="url(#cameraBodyGrad)"
+                        stroke="#FFFFFF"
+                        strokeOpacity="0.6"
+                        strokeWidth="1"
+                      />
+
+                      {/* Gold Clinical Accent Stripe along Camera Housing */}
+                      <path
+                        d="M92 222H176"
+                        stroke="#B58E49"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      />
+
+                      {/* Multi-Element Optical Objective Barrel (Facing Left toward Patient Chin-Rest) */}
+                      <rect x="66" y="226" width="22" height="44" rx="5" fill="#2E3B38" />
+                      <rect x="60" y="231" width="8" height="34" rx="3" fill="#B58E49" />
+                      {/* Optical Coated Glass Lens */}
+                      <ellipse cx="60" cy="248" rx="4.5" ry="15" fill="url(#opticalLensGrad)" />
+                      <ellipse cx="59" cy="243" rx="1.5" ry="5" fill="#FFFFFF" fillOpacity="0.65" />
+
+                      {/* Clinician Operator Touch-Control Screen on Back of Camera */}
+                      <rect
+                        x="126"
+                        y="234"
+                        width="50"
+                        height="38"
+                        rx="6"
+                        fill="#15201E"
+                        stroke="#3B666B"
+                        strokeWidth="1.5"
+                      />
+                      {/* Mini Alignment Crosshair on Camera Operator Display */}
+                      <circle cx="151" cy="253" r="10" stroke="#34D399" strokeWidth="1.2" strokeDasharray="2 2" />
+                      <circle cx="151" cy="253" r="3" fill="#B58E49" />
+
+                      {/* Precision Alignment Joystick */}
+                      <path d="M121 336V316" stroke="#2B3A38" strokeWidth="4.5" strokeLinecap="round" />
+                      <circle cx="121" cy="313" r="6.5" fill="#3B666B" />
+                      <circle cx="119" cy="311" r="2" fill="#A3B5B0" />
+                    </g>
+
+                    {/* 4. Warm Medical Examination Desk Surface */}
+                    <rect x="0" y="362" width="430" height="58" fill="url(#deskSurfaceGrad)" />
+                    <line x1="0" y1="362" x2="430" y2="362" stroke="#F9F8F6" strokeOpacity="0.55" strokeWidth="1.5" />
+                  </svg>
+
+                  {/* Top Subtle Vignette for Arch Depth */}
+                  <div className="relative z-10 h-10 pointer-events-none" />
+
+                  {/* Bottom Arch Clinical Telemetry Bar */}
+                  <div className="relative z-10 mx-5 mb-0 bg-[#F9F8F6] rounded-t-2xl p-5 shadow-lg border-t-4 border-[#B58E49]">
+                    <div className="grid grid-cols-3 gap-2 text-center divide-x divide-[#2B3A38]/15">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#3B666B]">
+                          Grad-CAM
+                        </p>
+                        <p className="font-editorial text-lg font-bold text-[#2B3A38] mt-0.5">
+                          Lesion Focus
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#3B666B]">
+                          SHAP Maps
+                        </p>
+                        <p className="font-editorial text-lg font-bold text-[#2B3A38] mt-0.5">
+                          Pixel Attribution
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#3B666B]">
+                          Benchmarks
+                        </p>
+                        <p className="font-editorial text-lg font-bold text-[#2B3A38] mt-0.5">
+                          3 Deep Models
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lower-Right Overlapping Slate-Teal Botanical Leaf Cluster (#3B666B) */}
+                <svg
+                  viewBox="0 0 95 95"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-16 h-16 sm:w-20 sm:h-20 absolute -bottom-2 -right-1 z-20 pointer-events-none"
+                  aria-hidden="true"
+                >
+                  {/* Center tall teal petal */}
+                  <path
+                    d="M48 12C38 26 38 44 48 58C58 44 58 26 48 12Z"
+                    fill="#3B666B"
+                  />
+                  {/* Left angled teal petal */}
+                  <path
+                    d="M14 40C28 38 41 47 45 61C31 63 18 54 14 40Z"
+                    fill="#4A7478"
+                  />
+                  {/* Right angled teal petal */}
+                  <path
+                    d="M82 38C68 37 56 46 52 60C66 61 78 52 82 38Z"
+                    fill="#3B666B"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 4. CORE INTERACTIVE CLINICAL SCREENING & XAI DIAGNOSTIC WORKSPACE */}
       <section
         ref={workspaceRef}
-        className="py-16 sm:py-24 px-4 sm:px-8 max-w-7xl mx-auto"
+        className="py-16 sm:py-24 px-4 sm:px-8 max-w-7xl mx-auto border-t border-[#2B3A38]/8"
       >
         {/* Editorial Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
@@ -1495,7 +2236,7 @@ export default function App() {
       </section>
 
       {/* 6. SYSTEM ARCHITECTURE & CLINICAL FOOTER */}
-      <footer ref={aboutRef} className="bg-[#2B3A38] text-white pt-16 pb-12 px-4 sm:px-8">
+      <footer className="bg-[#2B3A38] text-white pt-16 pb-12 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-white/15">
             <div className="md:col-span-5">
@@ -1505,7 +2246,7 @@ export default function App() {
                 </div>
                 <div>
                   <span className="font-editorial text-2xl tracking-[0.18em] uppercase font-semibold block">
-                    Ocularis
+                    OcuLens
                   </span>
                   <span className="font-editorial text-xs tracking-[0.26em] uppercase text-[#E6C587] block">
                     Retinal AI System
@@ -1548,7 +2289,7 @@ export default function App() {
           </div>
 
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-white/60 gap-4">
-            <p>© 2026 Ocularis Retinal AI — AI-Based Eye Disease Screening System.</p>
+            <p>© 2026 OcuLens Retinal AI — AI-Based Eye Disease Screening System.</p>
             <p>Built for Transparent Clinical Trust &amp; Comparative Deep Learning Research.</p>
           </div>
         </div>
